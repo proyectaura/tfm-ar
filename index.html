@@ -251,18 +251,26 @@
   </footer>
 
   <!-- Lógica JavaScript Interactiva -->
+<!-- Lógica JavaScript Interactiva Corregida -->
   <script>
     function cambiarModelo(rutaModelo, titulo, descripcion) {
-      // 1. Actualizar el visor 3D con efecto de transición limpia
       const visor = document.getElementById('visor');
+      
+      // 1. Detenemos temporalmente el giro para evitar que se congele el motor gráfico
+      visor.removeAttribute('auto-rotate');
+
+      // 2. Actualizamos el archivo 3D del visor y los textos informativos
       visor.setAttribute('src', rutaModelo);
       visor.setAttribute('alt', titulo);
-
-      // 2. Actualizar los textos de la Ficha Técnica
       document.getElementById('titulo-pieza').innerText = titulo;
       document.getElementById('desc-pieza').innerText = descripcion;
 
-      // 3. Actualizar la estética de las pestañas (cuál se ve activa)
+      // 3. Reactivamos el giro automático de forma forzada para la nueva pieza
+      setTimeout(() => {
+        visor.setAttribute('auto-rotate', '');
+      }, 50);
+
+      // 4. Actualizar la estética de las pestañas (cuál se ve activa)
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
       
