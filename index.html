@@ -2,37 +2,274 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Prueba Realidad Aumentada TFM</title>
+  <title>Aula Virtual de Arqueología - Proyecto AR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Script oficial de Google para el visor 3D y Realidad Aumentada -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; text-align: center; background: #f5f5f5; }
-    header { padding: 20px; background: #0066cc; color: white; }
-    model-viewer { width: 100%; height: 65vh; background: #ffffff; }
-    .contenido { padding: 20px; }
+    /* Estilos Globales - Paleta de colores Neo-Arqueológica */
+    :root {
+      --primary: #a0522d;       /* Terracota / Tierra */
+      --primary-light: #f5f0eb; /* Arena claro para fondos */
+      --dark: #2c3e50;          /* Grafito para textos principales */
+      --grey: #7f8c8d;          /* Gris para secundarios */
+      --white: #ffffff;
+      --shadow: rgba(160, 82, 45, 0.15);
+    }
+
+    body { 
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
+      margin: 0; 
+      background-color: #faf8f5; 
+      color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Cabecera Profesional */
+    header { 
+      background: var(--white); 
+      padding: 15px 20px; 
+      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+      border-bottom: 3px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Icono/Logo Académico Dinámico mediante CSS */
+    .logo-icono {
+      background: var(--primary);
+      color: var(--white);
+      width: 35px;
+      height: 35px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      box-shadow: 0 3px 6px rgba(160, 82, 45, 0.3);
+    }
+
+    header h1 { 
+      margin: 0; 
+      font-size: 1.4rem; 
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--dark);
+    }
+
+    /* Contenedor Principal Adaptable (Mobile-First) */
+    .main-container {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+      padding: 15px;
+    }
+
+    /* Selector de herramientas tipo "Pestañas Modernas" */
+    .selector-piezas { 
+      display: flex; 
+      justify-content: space-between; 
+      gap: 8px; 
+      background: #eee6de; 
+      padding: 6px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .btn-pieza { 
+      flex: 1;
+      padding: 12px 8px; 
+      border: none; 
+      border-radius: 8px; 
+      background: transparent; 
+      color: var(--dark); 
+      font-weight: 600; 
+      font-size: 0.9rem;
+      cursor: pointer; 
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-pieza:hover {
+      background: rgba(255,255,255,0.5);
+    }
+
+    .btn-pieza.activo { 
+      background: var(--white); 
+      color: var(--primary); 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    /* Ventana del Visor 3D Estilo Galería de Museo */
+    .contenedor-visor {
+      background: var(--white);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px var(--shadow);
+      border: 1px solid rgba(160, 82, 45, 0.1);
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    model-viewer { 
+      width: 100%; 
+      height: 45vh; 
+      background-color: #fdfcfb;
+    }
+
+    /* Customización del botón nativo de Realidad Aumentada de Google */
+    model-viewer::part(ar-button) {
+      background-color: var(--primary);
+      border-radius: 30px;
+      border: none;
+      box-shadow: 0 4px 12px rgba(160, 82, 45, 0.4);
+      color: var(--white);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 20px;
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      transform: scale(1.05);
+      transition: background-color 0.2s;
+    }
+
+    model-viewer::part(ar-button):active {
+      background-color: #874121;
+    }
+
+    /* Ficha Técnica / Textos Informativos */
+    .ficha-tecnica { 
+      text-align: left;
+      background: var(--white);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+      border-left: 5px solid var(--primary);
+    }
+
+    .ficha-tecnica h2 { 
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+      color: var(--dark);
+    }
+
+    .descripcion { 
+      font-size: 1rem; 
+      line-height: 1.6; 
+      color: #4a5568; 
+      margin-bottom: 0;
+    }
+
+    /* Guía didáctica inferior para el alumno */
+    .guia-alumno {
+      margin-top: 20px;
+      padding: 12px;
+      background: var(--primary-light);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #6c543c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* Footer Institucional */
+    footer {
+      padding: 15px;
+      font-size: 0.8rem;
+      color: var(--grey);
+      background: #f1ede8;
+      margin-top: auto;
+      border-top: 1px solid #e1dad0;
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- Cabecera con Logo Académico -->
   <header>
-    <h1>Mi Bifaz Paleolítico en 3D</h1>
+    <div class="logo-icono">🏛️</div>
+    <h1>Laboratorio de Arqueología AR</h1>
   </header>
 
-  <model-viewer
-    src="modelos/bifaz.glb"
-    alt="Bifaz Paleolítico de prueba"
-    ar
-    ar-modes="webxr scene-viewer quick-look"
-    camera-controls
-    auto-rotate
-    shadow-intensity="1">
-  </model-viewer>
+  <div class="main-container">
 
-  <div class="contenido">
-    <p>Si estás en el ordenador, puedes pinchar y arrastrar el bifaz para verlo por todos lados.</p>
-    <p><strong>Si estás en el móvil, dale al botón de abajo a la derecha para proyectarlo en Realidad Aumentada.</strong></p>
+    <!-- Pestañas de Navegación de Piezas Arqueológicas -->
+    <div class="selector-piezas">
+      <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz Paleolítico', 'Este bifaz de sílex tallado por las dos caras era la \"navaja suiza\" del Paleolítico (hace unos 300.000 años). Se utilizaba para cortar carne, raspar pieles y romper huesos. Representa la evolución cognitiva y el control de la técnica de talla por percusión.')">1. Paleolítico</button>
+      
+      <button class="btn-pieza" onclick="cambiarModelo('modelos/hacha.glb', 'Hacha Pulimentada', 'Esta pieza es característica de la revolución del Neolítico. A diferencia de las herramientas talladas, la piedra se pule frotándola intensamente con arenisca. Su aparición está directamente vinculada al nacimiento de la agricultura y la necesidad de talar bosques para abrir campos de cultivo.')">2. Neolítico</button>
+      
+      <button class="btn-pieza" onclick="cambiarModelo('modelos/flecha.glb', 'Punta de Flecha', 'Punta de flecha perteneciente a la Edad de los Metales (Calcolítico/Bronce). Muestra una especialización metalúrgica y armamentística avanzada. Su diseño ligero, aerodinámico y letal evidencia la evolución de la caza a gran distancia y el aumento de los conflictos bélicos entre comunidades sedentarias.')">3. Edad Metales</button>
+    </div>
+
+    <!-- Contenedor del Museo 3D -->
+    <div class="contenedor-visor">
+      <model-viewer
+        id="visor"
+        src="modelos/bifaz.glb"
+        alt="Bifaz Paleolítico"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls
+        auto-rotate
+        interaction-prompt="auto"
+        shadow-intensity="1.5"
+        shadow-softness="1">
+      </model-viewer>
+    </div>
+
+    <!-- Ficha Educativa Dinámica -->
+    <div class="ficha-tecnica">
+      <h2 id="titulo-pieza">Bifaz Paleolítico</h2>
+      <p id="desc-pieza" class="descripcion">Este bifaz de sílex tallado por las dos caras era la "navaja suiza" del Paleolítico (hace unos 300.000 años). Se utilizaba para cortar carne, raspar pieles y romper huesos. Representa la evolución cognitiva y el control de la técnica de talla por percusión.</p>
+    </div>
+
+    <!-- Instrucciones Rápidas para el Alumnado -->
+    <div class="guia-alumno">
+      <span>💡</span> <span><strong>Guía de uso:</strong> Rota la pieza en 3D con tu dedo. Si estás en el móvil, pulsa el botón flotante para proyectarla a escala real en tu aula.</span>
+    </div>
+
   </div>
+
+  <!-- Pie de página formal del TFM -->
+  <footer>
+    Propuesta de Innovación Didáctica - Trabajo de Fin de Máster © 2026
+  </footer>
+
+  <!-- Lógica JavaScript Interactiva -->
+  <script>
+    function cambiarModelo(rutaModelo, titulo, descripcion) {
+      // 1. Actualizar el visor 3D con efecto de transición limpia
+      const visor = document.getElementById('visor');
+      visor.setAttribute('src', rutaModelo);
+      visor.setAttribute('alt', titulo);
+
+      // 2. Actualizar los textos de la Ficha Técnica
+      document.getElementById('titulo-pieza').innerText = titulo;
+      document.getElementById('desc-pieza').innerText = descripcion;
+
+      // 3. Actualizar la estética de las pestañas (cuál se ve activa)
+      const botones = document.querySelectorAll('.btn-pieza');
+      botones.forEach(btn => btn.classList.remove('activo'));
+      
+      // Iluminar el botón que ha recibido el clic
+      event.currentTarget.classList.add('activo');
+    }
+  </script>
+
 </body>
 </html>
