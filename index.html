@@ -5,7 +5,6 @@
   <title>Aula Virtual de Arqueología - Proyecto AR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Script oficial de Google para el visor 3D y Realidad Aumentada -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
@@ -41,7 +40,6 @@
       gap: 12px;
     }
 
-    /* Icono/Logo Académico Dinámico mediante CSS */
     .logo-icono {
       background: var(--primary);
       color: var(--white);
@@ -64,7 +62,6 @@
       color: var(--dark);
     }
 
-    /* Contenedor Principal Adaptable (Mobile-First) */
     .main-container {
       flex: 1;
       max-width: 800px;
@@ -125,7 +122,7 @@
       background-color: #fdfcfb;
     }
 
-    /* Customización del botón nativo de Realidad Aumentada de Google */
+    /* Customización del botón nativo de Realidad Aumentada */
     model-viewer::part(ar-button) {
       background-color: var(--primary);
       border-radius: 30px;
@@ -141,10 +138,6 @@
       right: 16px;
       transform: scale(1.05);
       transition: background-color 0.2s;
-    }
-
-    model-viewer::part(ar-button):active {
-      background-color: #874121;
     }
 
     /* Ficha Técnica / Textos Informativos */
@@ -171,7 +164,6 @@
       margin-bottom: 0;
     }
 
-    /* Guía didáctica inferior para el alumno */
     .guia-alumno {
       margin-top: 20px;
       padding: 12px;
@@ -185,7 +177,6 @@
       gap: 6px;
     }
 
-    /* Footer Institucional */
     footer {
       padding: 15px;
       font-size: 0.8rem;
@@ -199,7 +190,6 @@
 
 <body>
 
-  <!-- Cabecera con Logo Académico -->
   <header>
     <div class="logo-icono">🏛️</div>
     <h1>Laboratorio de Arqueología AR</h1>
@@ -207,7 +197,6 @@
 
   <div class="main-container">
 
-    <!-- Pestañas de Navegación de Piezas Arqueológicas -->
     <div class="selector-piezas">
       <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz Paleolítico', 'Este bifaz de sílex tallado por las dos caras era la \"navaja suiza\" del Paleolítico (hace unos 300.000 años). Se utilizaba para cortar carne, raspar pieles y romper huesos. Representa la evolución cognitiva y el control de la técnica de talla por percusión.')">1. Paleolítico</button>
       
@@ -216,11 +205,11 @@
       <button class="btn-pieza" onclick="cambiarModelo('modelos/flecha.glb', 'Punta de Flecha', 'Punta de flecha perteneciente a la Edad de los Metales (Calcolítico/Bronce). Muestra una especialización metalúrgica y armamentística avanzada. Su diseño ligero, aerodinámico y letal evidencia la evolución de la caza a gran distancia y el aumento de los conflictos bélicos entre comunidades sedentarias.')">3. Edad Metales</button>
     </div>
 
-    <!-- Contenedor del Museo 3D -->
     <div class="contenedor-visor">
       <model-viewer
         id="visor"
         src="modelos/bifaz.glb"
+        ios-src="modelos/bifaz.usdz"
         alt="Bifaz Paleolítico"
         ar
         ar-modes="webxr scene-viewer quick-look"
@@ -232,49 +221,48 @@
       </model-viewer>
     </div>
 
-    <!-- Ficha Educativa Dinámica -->
     <div class="ficha-tecnica">
       <h2 id="titulo-pieza">Bifaz Paleolítico</h2>
       <p id="desc-pieza" class="descripcion">Este bifaz de sílex tallado por las dos caras era la "navaja suiza" del Paleolítico (hace unos 300.000 años). Se utilizaba para cortar carne, raspar pieles y romper huesos. Representa la evolución cognitiva y el control de la técnica de talla por percusión.</p>
     </div>
 
-    <!-- Instrucciones Rápidas para el Alumnado -->
     <div class="guia-alumno">
       <span>💡</span> <span><strong>Guía de uso:</strong> Rota la pieza en 3D con tu dedo. Si estás en el móvil, pulsa el botón flotante para proyectarla a escala real en tu aula.</span>
     </div>
 
   </div>
 
-  <!-- Pie de página formal del TFM -->
   <footer>
     Propuesta de Innovación Didáctica - Trabajo de Fin de Máster © 2026
   </footer>
 
-  <!-- Lógica JavaScript Interactiva -->
-<!-- Lógica JavaScript Interactiva Corregida -->
   <script>
     function cambiarModelo(rutaModelo, titulo, descripcion) {
       const visor = document.getElementById('visor');
       
-      // 1. Detenemos temporalmente el giro para evitar que se congele el motor gráfico
+      // 1. Apagamos el giro un instante para evitar bloqueos gráficos
       visor.removeAttribute('auto-rotate');
 
-      // 2. Actualizamos el archivo 3D del visor y los textos informativos
+      // 2. Actualizamos el modelo para Android (.glb)
       visor.setAttribute('src', rutaModelo);
+      
+      // 3. ¡Magia para iPhone!: Cambiamos la extensión .glb por .usdz automáticamente en el código
+      const rutaIphone = rutaModelo.replace('.glb', '.usdz');
+      visor.setAttribute('ios-src', rutaIphone);
+
+      // 4. Actualizamos el resto de la ficha técnica
       visor.setAttribute('alt', titulo);
       document.getElementById('titulo-pieza').innerText = titulo;
       document.getElementById('desc-pieza').innerText = descripcion;
 
-      // 3. Reactivamos el giro automático de forma forzada para la nueva pieza
+      // 5. Forzamos el reinicio del giro automático en el nuevo modelo
       setTimeout(() => {
         visor.setAttribute('auto-rotate', '');
       }, 50);
 
-      // 4. Actualizar la estética de las pestañas (cuál se ve activa)
+      // 6. Estética de los botones activos
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
-      
-      // Iluminar el botón que ha recibido el clic
       event.currentTarget.classList.add('activo');
     }
   </script>
