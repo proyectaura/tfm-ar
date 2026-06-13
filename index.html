@@ -236,7 +236,7 @@
 
   <div class="main-container">
 
-    <!-- Botonera limpia pasándole "this" para evitar que falle el evento de clic en tabletas -->
+    <!-- Botonera con evento limpio pasando la referencia de control -->
     <div class="selector-piezas">
       <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz: La supervivencia nómada', 'Este bifaz de sílex tallado por las dos caras representa la vida nómada del Paleolítico. Las comunidades dependían de lo que cazaban y recolectaban, moviéndose de un lugar a otro. Esta Navaja suiza de piedra servía para todo: cortar carne, madera, limpiar pieles y romper huesos para alimentarse.', 'HIXI5sDG6hc', this)">1. Paleolítico (Nómadas)</button>
       
@@ -278,7 +278,7 @@
           src="https://www.youtube.com/embed/HIXI5sDG6hc" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowfullscreen>
-         frameboder="0"></iframe>
+        </iframe>
       </div>
     </div>
 
@@ -293,54 +293,57 @@
     Propuesta de Innovación Didáctica - Trabajo de Fin de Máster © 2026
   </footer>
 
-  <!-- Lógica JavaScript Inmune a Bloqueos de Navegación -->
+  <!-- Lógica JavaScript Anti-Bloqueos por Caché de Navegador -->
   <script>
     function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
-      const visor = document.getElementById('visor');
-      
-      // 1. Apagamos rotación para desestresar el buffer gráfico
-      visor.removeAttribute('auto-rotate');
-
-      // 2. Cambio de archivos e inyección de datos
-      visor.setAttribute('src', rutaModelo);
-      const rutaIphone = rutaModelo.replace('.glb', '.usdz');
-      visor.setAttribute('ios-src', rutaIphone);
-
-      // 3. Control de escalas estricto para el TFM
-      if (rutaModelo.includes('flecha.glb')) {
-        visor.setAttribute('scale', '4 4 4');
-      } else if (rutaModelo.includes('hacha.glb')) {
-        visor.setAttribute('scale', '5 5 5');
-      } else {
-        visor.setAttribute('scale', '1 1 1');
-      }
-
-      // 4. Actualizar textos de la interfaz pedagógica
-      visor.setAttribute('alt', titulo);
-      document.getElementById('titulo-pieza').innerText = titulo;
-      document.getElementById('desc-pieza').innerText = descripcion;
-
-      // 5. Forzamos la recarga limpia de YouTube sin romper la sesión de clics
-      const iframeVideo = document.getElementById('video-youtube');
-      iframeVideo.src = 'https://www.youtube.com/embed/' + idVideo;
-
-      // 6. SOLUCIÓN AL CONGELAMIENTO DEL BIFAZ: Forzamos el recálculo físico del visor 3D
-      if (typeof visor.updateFraming === 'function') {
-        setTimeout(() => { visor.updateFraming(); }, 50);
-      }
-
-      // 7. Reactivar el giro de forma asíncrona controlada
-      setTimeout(() => { 
-        visor.setAttribute('auto-rotate', ''); 
-      }, 100);
-
-      // 8. Manejo del estado activo seguro (Usa la referencia directa del botón 'this')
+      // 1. Cambiar la clase activa visual en los botones inmediatamente
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
-      
       if (botonPulsado) {
         botonPulsado.classList.add('activo');
       }
+
+      // 2. Forzar la actualización de los textos pedagógicos
+      document.getElementById('titulo-pieza').innerText = titulo;
+      document.getElementById('desc-pieza').innerText = descripcion;
+
+      // 3. ACTUALIZACIÓN INMUNE DEL VÍDEO: Metemos un anti-cache timestamp (?t=)
+      // Esto evita que el navegador ignore la recarga cuando vuelve al primer vídeo
+      const iframeVideo = document.getElementById('video-youtube');
+      iframeVideo.src = 'https://www.youtube.com/embed/' + idVideo + '?rel=0&timestamp=' + new Date().getTime();
+
+      // 4. RESETEO Y CARGA TRANSICIONAL DEL VISOR 3D
+      const visor = document.getElementById('visor');
+      visor.removeAttribute('auto-rotate');
+      
+      // Vaciamos momentáneamente para obligar al renderizador a bajarse el bifaz de nuevo
+      visor.setAttribute('src', '');
+      visor.setAttribute('ios-src', '');
+
+      // Inyectamos las rutas definitivas tras un micro-retardo imperceptible (10ms)
+      setTimeout(() => {
+        visor.setAttribute('src', rutaModelo);
+        const rutaIphone = rutaModelo.replace('.glb', '.usdz');
+        visor.setAttribute('ios-src', rutaIphone);
+        visor.setAttribute('alt', titulo);
+
+        // Control de escalas riguroso para evitar bugs de deformación espacial
+        if (rutaModelo.includes('flecha.glb')) {
+          visor.setAttribute('scale', '4 4 4');
+        } else if (rutaModelo.includes('hacha.glb')) {
+          visor.setAttribute('scale', '5 5 5');
+        } else {
+          visor.setAttribute('scale', '1 1 1');
+        }
+
+        // Obligar al motor de Google a redibujar el encuadre dimensional
+        if (typeof visor.updateFraming === 'function') {
+          visor.updateFraming();
+        }
+        
+        // Volver a activar la rotación sutil del museo
+        visor.setAttribute('auto-rotate', '');
+      }, 10);
     }
   </script>
 
