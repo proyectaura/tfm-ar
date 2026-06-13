@@ -249,7 +249,9 @@
         src="modelos/bifaz.glb"
         ios-src="modelos/bifaz.usdz"
         alt="Bifaz Paleolítico"
+        scale="1 1 1"
         ar
+        ar-scale="auto"
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
         auto-rotate
@@ -290,7 +292,7 @@
     function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
       const visor = document.getElementById('visor');
       
-      // 1. Desactivar rotación momentáneamente para la carga
+      // 1. Desactivar rotación momentáneamente para la carga limpia
       visor.removeAttribute('auto-rotate');
 
       // 2. Cambiar textos e iframe de vídeo directamente
@@ -298,13 +300,13 @@
       document.getElementById('desc-pieza').innerText = descripcion;
       document.getElementById('video-youtube').src = 'https://www.youtube.com/embed/' + idVideo;
 
-      // 3. Cambiar única y exclusivamente las rutas del modelo 3D
+      // 3. Cambiar las rutas del modelo 3D
       visor.setAttribute('src', rutaModelo);
       const rutaIphone = rutaModelo.replace('.glb', '.usdz');
       visor.setAttribute('ios-src', rutaIphone);
       visor.setAttribute('alt', titulo);
 
-      // 4. Refrescar el encuadre nativo de Google para que adapte la cámara al nuevo archivo
+      // 4. Refrescar el encuadre nativo de Google para adaptar la cámara al nuevo archivo
       if (typeof visor.updateFraming === 'function') {
         visor.updateFraming();
       }
