@@ -236,17 +236,16 @@
 
   <div class="main-container">
 
-    <!-- Pestañas de Navegación del TFM - Opción: Del Nomadismo al Sedentarismo -->
-    <!-- ⚠️ ATENCIÓN: Asegúrate de poner aquí abajo tus códigos reales de YouTube sustituyendo los míos de ejemplo -->
+    <!-- Botonera limpia pasándole "this" para evitar que falle el evento de clic en tabletas -->
     <div class="selector-piezas">
-      <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz: La supervivencia nómada', 'Este bifaz de sílex tallado por las dos caras representa la vida nómada del Paleolítico. Las comunidades dependían de lo que cazaban y recolectaban, moviéndose de un lugar a otro. Esta \"navaja suiza\" de piedra servía para todo: cortar carne, madera, limpiar pieles y romper huesos para alimentarse.', 'HIXI5sDG6hc')">1. Paleolítico (Nómadas)</button>
+      <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz: La supervivencia nómada', 'Este bifaz de sílex tallado por las dos caras representa la vida nómada del Paleolítico. Las comunidades dependían de lo que cazaban y recolectaban, moviéndose de un lugar a otro. Esta Navaja suiza de piedra servía para todo: cortar carne, madera, limpiar pieles y romper huesos para alimentarse.', 'HIXI5sDG6hc', this)">1. Paleolítico (Nómadas)</button>
       
-      <button class="btn-pieza" onclick="cambiarModelo('modelos/flecha.glb', 'Punta de Flecha: Cazadores avanzados', 'A finales del Paleolítico, los grupos humanos perfeccionaron la caza inventando el arco y las flechas. Tallando el sílex de forma minuciosa y ligera, consiguieron proyectiles muy precisos para cazar a gran distancia de forma segura, adaptándose mejor a los cambios del entorno.', 'VTgPOtZh_r8')">2. Paleolítico (Cazadores)</button>
+      <button class="btn-pieza" onclick="cambiarModelo('modelos/flecha.glb', 'Punta de Flecha: Cazadores avanzados', 'A finales del Paleolítico, los grupos humanos perfeccionaron la caza inventando el arco y las flechas. Tallando el sílex de forma minuciosa y ligera, consiguieron proyectiles muy precisos para cazar a gran distancia de forma segura, adaptándose mejor a los cambios del entorno.', 'VTgPOtZh_r8', this)">2. Paleolítico (Cazadores)</button>
       
-      <button class="btn-pieza" onclick="cambiarModelo('modelos/hacha.glb', 'Hacha: Los primeros agricultores', 'Esta hacha de piedra pulimentada marca la gran revolución del Neolítico: el paso al sedentarismo. Al descubrir la agricultura y la ganadería, los humanos construyeron los primeros poblados fijos. Necesitaron estas nuevas hachas, mucho más resistentes, para talar bosques y despejar los campos de cultivo.', 'ZWEuoyNsfzA')">3. Neolítico (Sedentarios)</button>
+      <button class="btn-pieza" onclick="cambiarModelo('modelos/hacha.glb', 'Hacha: Los primeros agricultores', 'Esta hacha de piedra pulimentada marca la gran revolución del Neolítico: el paso al sedentarismo. Al descubrir la agricultura y la ganadería, los humanos construyeron los primeros poblados fijos. Necesitaron estas nuevas hachas, mucho más resistentes, para talar bosques y despejar los campos de cultivo.', 'ZWEuoyNsfzA', this)">3. Neolítico (Sedentarios)</button>
     </div>
 
-    <!-- Contenedor del Museo 3D (Autogestiona Android e iPhone) -->
+    <!-- Contenedor del Museo 3D -->
     <div class="contenedor-visor">
       <model-viewer
         id="visor"
@@ -274,13 +273,12 @@
     <div class="contenedor-video">
       <h3 class="video-titulo">🎬 Vídeo de Apoyo Didáctico</h3>
       <div class="video-responsive">
-        <!-- Vídeo inicial corregido (Debe ser idéntico al código de vídeo del primer botón) -->
         <iframe 
           id="video-youtube"
           src="https://www.youtube.com/embed/HIXI5sDG6hc" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowfullscreen>
-        </iframe>
+         frameboder="0"></iframe>
       </div>
     </div>
 
@@ -295,47 +293,53 @@
     Propuesta de Innovación Didáctica - Trabajo de Fin de Máster © 2026
   </footer>
 
-  <!-- Lógica JavaScript Mejorada e Inmune a Bloqueos de Navegación -->
+  <!-- Lógica JavaScript Inmune a Bloqueos de Navegación -->
   <script>
-    function cambiarModelo(rutaModelo, titulo, descripcion, idVideo) {
+    function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
       const visor = document.getElementById('visor');
       
-      // 1. Apagamos rotación para que el navegador no sufra al cambiar de archivo
+      // 1. Apagamos rotación para desestresar el buffer gráfico
       visor.removeAttribute('auto-rotate');
 
-      // 2. CAMBIO DE MODELO SEGURO (Primero cambiamos el archivo y la extensión)
+      // 2. Cambio de archivos e inyección de datos
       visor.setAttribute('src', rutaModelo);
       const rutaIphone = rutaModelo.replace('.glb', '.usdz');
       visor.setAttribute('ios-src', rutaIphone);
 
-      // 3. LIMPIEZA Y ESCALADO ABSOLUTO (Evita que el tamaño gigante del hacha se quede pegado al volver al bifaz)
+      // 3. Control de escalas estricto para el TFM
       if (rutaModelo.includes('flecha.glb')) {
-        visor.setAttribute('scale', '4 4 4'); // Escala para la flecha
+        visor.setAttribute('scale', '4 4 4');
       } else if (rutaModelo.includes('hacha.glb')) {
-        visor.setAttribute('scale', '5 5 5'); // Escala para el hacha
+        visor.setAttribute('scale', '5 5 5');
       } else {
-        visor.setAttribute('scale', '1 1 1'); // Escala normal por defecto para el Bifaz
+        visor.setAttribute('scale', '1 1 1');
       }
 
-      // 4. Actualizar textos de la ficha pedagógica
+      // 4. Actualizar textos de la interfaz pedagógica
       visor.setAttribute('alt', titulo);
       document.getElementById('titulo-pieza').innerText = titulo;
       document.getElementById('desc-pieza').innerText = descripcion;
 
-      // 5. Actualizar vídeo de YouTube de forma limpia
+      // 5. Forzamos la recarga limpia de YouTube sin romper la sesión de clics
       const iframeVideo = document.getElementById('video-youtube');
-      iframeVideo.setAttribute('src', 'https://www.youtube.com/embed/' + idVideo);
+      iframeVideo.src = 'https://www.youtube.com/embed/' + idVideo;
 
-      // 6. Reactivar el giro de forma asíncrona controlada
+      // 6. SOLUCIÓN AL CONGELAMIENTO DEL BIFAZ: Forzamos el recálculo físico del visor 3D
+      if (typeof visor.updateFraming === 'function') {
+        setTimeout(() => { visor.updateFraming(); }, 50);
+      }
+
+      // 7. Reactivar el giro de forma asíncrona controlada
       setTimeout(() => { 
         visor.setAttribute('auto-rotate', ''); 
-      }, 60);
+      }, 100);
 
-      // 7. Cambiar estilo estético al botón pulsado
+      // 8. Manejo del estado activo seguro (Usa la referencia directa del botón 'this')
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
-      if (event && event.currentTarget) {
-        event.currentTarget.classList.add('activo');
+      
+      if (botonPulsado) {
+        botonPulsado.classList.add('activo');
       }
     }
   </script>
