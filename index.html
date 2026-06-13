@@ -249,7 +249,7 @@
         src="modelos/bifaz.glb"
         ios-src="modelos/bifaz.usdz"
         alt="Bifaz Paleolítico"
-        scale="0.6 0.6 0.6"
+        scale="1 1 1"
         ar
         ar-modes="webxr scene-viewer quick-look"
         camera-controls
@@ -289,49 +289,55 @@
 
   <script>
     function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
-      const visor = document.getElementById('visor');
-      
-      // 1. Apagamos la rotación temporalmente
-      visor.removeAttribute('auto-rotate');
-
-      // 2. CAMBIO DIRECTO DE ATRIBUTOS (Sin vaciar rutas para evitar pantallas en blanco)
-      visor.setAttribute('src', rutaModelo);
-      const rutaIphone = rutaModelo.replace('.glb', '.usdz');
-      visor.setAttribute('ios-src', rutaIphone);
-      visor.setAttribute('alt', titulo);
-
-      // 3. CALIBRACIÓN DE ESCALAS PERFECTA
-      if (rutaModelo.includes('flecha.glb')) {
-        visor.setAttribute('scale', '1.5 1.5 1.5'); // Ajustada para que no aparezca lejísimos ni intocable
-      } else if (rutaModelo.includes('hacha.glb')) {
-        visor.setAttribute('scale', '15 15 15');   // Subida drásticamente para que no salga minúscula
-      } else {
-        visor.setAttribute('scale', '0.6 0.6 0.6'); // Reducida para que el Bifaz no sea gigante en móvil
-      }
-
-      // 4. Actualizar textos de la interfaz pedagógica
-      document.getElementById('titulo-pieza').innerText = titulo;
-      document.getElementById('desc-pieza').innerText = descripcion;
-
-      // 5. Actualizar el enlace del vídeo de apoyo
-      document.getElementById('video-youtube').src = 'https://www.youtube.com/embed/' + idVideo;
-
-      // 6. Forzar al renderizador de Google a recalcular y desbloquear el Bifaz al regresar
-      if (typeof visor.updateFraming === 'function') {
-        visor.updateFraming();
-      }
-
-      // 7. Reactivar el giro automático con un pequeño delay de seguridad
-      setTimeout(() => { 
-        visor.setAttribute('auto-rotate', ''); 
-      }, 100);
-
-      // 8. Actualizar las clases estéticas de las pestañas activas
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
       if (botonPulsado) {
         botonPulsado.classList.add('activo');
       }
+
+      document.getElementById('titulo-pieza').innerText = titulo;
+      document.getElementById('desc-pieza').innerText = descripcion;
+
+      const iframeVideo = document.getElementById('video-youtube');
+      iframeVideo.src = 'https://www.youtube.com/embed/' + idVideo + '?rel=0&timestamp=' + new Date().getTime();
+
+      const visor = document.getElementById('visor');
+      visor.removeAttribute('auto-rotate');
+
+      // Modificamos las propiedades del visor de manera directa sin romper el render
+      visor.setAttribute('src', rutaModelo);
+      const rutaIphone = rutaModelo.replace('.glb', '.usdz');
+      visor.setAttribute('ios-src', rutaIphone);
+      visor.setAttribute('alt', titulo);
+
+      // El visor web se queda siempre en escala real humana 1 1 1
+      visor.setAttribute('scale', '1 1 1');
+
+      // 🛠️ CONFIGURACIÓN EXCLUSIVA PARA LA REALIDAD AUMENTADA (MÓVIL / PUPITRE)
+      if (rutaModelo.includes('bifaz.glb')) {
+        // Hacemos que el bifaz aparezca un poco más pequeño en el espacio real de la mesa
+        visor.removeAttribute('ar-scale'); // Permite que el alumno lo achique libremente
+        visor.setAttribute('ar-placement', 'floor');
+      } 
+      else if (rutaModelo.includes('flecha.glb')) {
+        // DESBLOQUEO TOTAL PUNTA DE FLECHA: Forzamos escala libre ("auto") para poder pellizcarla con los dedos,
+        // moverla por el pupitre, girarla y acercársela libremente sin restricciones.
+        visor.setAttribute('ar-scale', 'auto');
+        visor.setAttribute('ar-placement', 'floor');
+      } 
+      else if (rutaModelo.includes('hacha.glb')) {
+        // Hacha "más grande en la RA": Forzamos a que aparezca escalada a tamaño gigante en el mundo real
+        visor.setAttribute('ar-scale', 'fixed');
+        visor.setAttribute('scale', '5 5 5'); // Al ser fixed, esta escala se inyectará directamente dentro de la cámara RA
+      }
+
+      if (typeof visor.updateFraming === 'function') {
+        visor.updateFraming();
+      }
+      
+      setTimeout(() => { 
+        visor.setAttribute('auto-rotate', ''); 
+      }, 100);
     }
   </script>
 
