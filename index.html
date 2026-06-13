@@ -249,11 +249,8 @@
         src="modelos/bifaz.glb"
         ios-src="modelos/bifaz.usdz"
         alt="Bifaz Paleolítico"
-        scale="1 1 1"
         ar
-        ar-scale="auto"
-        ar-placement="floor"
-        camera-target="0m 0m 0m"
+        ar-modes="webxr scene-viewer quick-look"
         camera-controls
         auto-rotate
         interaction-prompt="auto"
@@ -293,39 +290,31 @@
     function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
       const visor = document.getElementById('visor');
       
-      // 1. Pausamos la rotación
+      // 1. Desactivar rotación momentáneamente para la carga
       visor.removeAttribute('auto-rotate');
 
-      // 2. Modificamos textos y el vídeo de YouTube (Funciona siempre)
+      // 2. Cambiar textos e iframe de vídeo directamente
       document.getElementById('titulo-pieza').innerText = titulo;
       document.getElementById('desc-pieza').innerText = descripcion;
       document.getElementById('video-youtube').src = 'https://www.youtube.com/embed/' + idVideo;
 
-      // 3. Cambiamos las rutas del modelo 3D de forma directa
+      // 3. Cambiar única y exclusivamente las rutas del modelo 3D
       visor.setAttribute('src', rutaModelo);
       const rutaIphone = rutaModelo.replace('.glb', '.usdz');
       visor.setAttribute('ios-src', rutaIphone);
       visor.setAttribute('alt', titulo);
 
-      // 4. CALIBRACIÓN INTELIGENTE DE TAMAÑOS
-      // El visor web se queda estricto en 1 1 1. Ajustamos escalas de forma que en la RA respondan bien.
-      if (rutaModelo.includes('hacha.glb')) {
-        visor.setAttribute('scale', '4 4 4'); // Hacemos el hacha 4 veces más grande para que en RA se vea perfecta
-      } else {
-        visor.setAttribute('scale', '1 1 1'); // El bifaz y la flecha se quedan en su tamaño estándar
-      }
-
-      // 5. Forzamos al visor a centrar la cámara en el nuevo objeto
+      // 4. Refrescar el encuadre nativo de Google para que adapte la cámara al nuevo archivo
       if (typeof visor.updateFraming === 'function') {
         visor.updateFraming();
       }
 
-      // 6. Reactivamos el giro con seguridad
+      // 5. Reactivar rotación automática
       setTimeout(() => { 
         visor.setAttribute('auto-rotate', ''); 
-      }, 100);
+      }, 50);
 
-      // 7. Cambiar clase activa en el menú de botones
+      // 6. Cambiar estado visual de las pestañas
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
       if (botonPulsado) {
