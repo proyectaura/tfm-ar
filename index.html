@@ -5,7 +5,6 @@
   <title>Aula Virtual de Arqueología - Proyecto AR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Script oficial de Google para el visor 3D y Realidad Aumentada -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
@@ -236,116 +235,5 @@
 
   <div class="main-container">
 
-    <!-- Botonera con evento limpio pasando la referencia de control -->
     <div class="selector-piezas">
-      <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz: La supervivencia nómada', 'Este bifaz de sílex tallado por las dos caras representa la vida nómada del Paleolítico. Las comunidades dependían de lo que cazaban y recolectaban, moviéndose de un lugar a otro. Esta Navaja suiza de piedra servía para todo: cortar carne, madera, limpiar pieles y romper huesos para alimentarse.', 'HIXI5sDG6hc', this)">1. Paleolítico (Nómadas)</button>
-      
-      <button class="btn-pieza" onclick="cambiarModelo('modelos/flecha.glb', 'Punta de Flecha: Cazadores avanzados', 'A finales del Paleolítico, los grupos humanos perfeccionaron la caza inventando el arco y las flechas. Tallando el sílex de forma minuciosa y ligera, consiguieron proyectiles muy precisos para cazar a gran distancia de forma segura, adaptándose mejor a los cambios del entorno.', 'VTgPOtZh_r8', this)">2. Paleolítico (Cazadores)</button>
-      
-      <button class="btn-pieza" onclick="cambiarModelo('modelos/hacha.glb', 'Hacha: Los primeros agricultores', 'Esta hacha de piedra pulimentada marca la gran revolución del Neolítico: el paso al sedentarismo. Al descubrir la agricultura y la ganadería, los humanos construyeron los primeros poblados fijos. Necesitaron estas nuevas hachas, mucho más resistentes, para talar bosques y despejar los campos de cultivo.', 'ZWEuoyNsfzA', this)">3. Neolítico (Sedentarios)</button>
-    </div>
-
-    <!-- Contenedor del Museo 3D -->
-    <div class="contenedor-visor">
-      <model-viewer
-        id="visor"
-        src="modelos/bifaz.glb"
-        ios-src="modelos/bifaz.usdz"
-        alt="Bifaz Paleolítico"
-        scale="1 1 1"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        camera-controls
-        auto-rotate
-        interaction-prompt="auto"
-        shadow-intensity="1.5"
-        shadow-softness="1">
-      </model-viewer>
-    </div>
-
-    <!-- Ficha Educativa Dinámica -->
-    <div class="ficha-tecnica">
-      <h2 id="titulo-pieza">Bifaz: La supervivencia nómada</h2>
-      <p id="desc-pieza" class="descripcion">Este bifaz de sílex tallado por las dos caras representa la vida nómada del Paleolítico. Las comunidades dependían de lo que cazaban y recolectaban, moviéndose de un lugar a otro. Esta "navaja suiza" de piedra servía para todo: cortar carne, madera, limpiar pieles y romper huesos para alimentarse.</p>
-    </div>
-
-    <!-- Sección Multimedia para el Vídeo Educativo Dinámico -->
-    <div class="contenedor-video">
-      <h3 class="video-titulo">🎬 Vídeo de Apoyo Didáctico</h3>
-      <div class="video-responsive">
-        <iframe 
-          id="video-youtube"
-          src="https://www.youtube.com/embed/HIXI5sDG6hc" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
-
-    <!-- Instrucciones Rápidas para el Alumnado -->
-    <div class="guia-alumno">
-      <span>💡</span> <span><strong>Guía de uso:</strong> Explora la herramienta en 3D, proyéctala en el suelo de clase usando el botón de RA o reproduce el vídeo para ver cómo vivían en esta etapa.</span>
-    </div>
-
-  </div>
-
-  <footer>
-    Propuesta de Innovación Didáctica - Trabajo de Fin de Máster © 2026
-  </footer>
-
-  <!-- Lógica JavaScript Anti-Bloqueos por Caché de Navegador -->
-  <script>
-    function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
-      // 1. Cambiar la clase activa visual en los botones inmediatamente
-      const botones = document.querySelectorAll('.btn-pieza');
-      botones.forEach(btn => btn.classList.remove('activo'));
-      if (botonPulsado) {
-        botonPulsado.classList.add('activo');
-      }
-
-      // 2. Forzar la actualización de los textos pedagógicos
-      document.getElementById('titulo-pieza').innerText = titulo;
-      document.getElementById('desc-pieza').innerText = descripcion;
-
-      // 3. ACTUALIZACIÓN INMUNE DEL VÍDEO: Metemos un anti-cache timestamp (?t=)
-      // Esto evita que el navegador ignore la recarga cuando vuelve al primer vídeo
-      const iframeVideo = document.getElementById('video-youtube');
-      iframeVideo.src = 'https://www.youtube.com/embed/' + idVideo + '?rel=0&timestamp=' + new Date().getTime();
-
-      // 4. RESETEO Y CARGA TRANSICIONAL DEL VISOR 3D
-      const visor = document.getElementById('visor');
-      visor.removeAttribute('auto-rotate');
-      
-      // Vaciamos momentáneamente para obligar al renderizador a bajarse el bifaz de nuevo
-      visor.setAttribute('src', '');
-      visor.setAttribute('ios-src', '');
-
-      // Inyectamos las rutas definitivas tras un micro-retardo imperceptible (10ms)
-      setTimeout(() => {
-        visor.setAttribute('src', rutaModelo);
-        const rutaIphone = rutaModelo.replace('.glb', '.usdz');
-        visor.setAttribute('ios-src', rutaIphone);
-        visor.setAttribute('alt', titulo);
-
-        // Control de escalas riguroso para evitar bugs de deformación espacial
-        if (rutaModelo.includes('flecha.glb')) {
-          visor.setAttribute('scale', '4 4 4');
-        } else if (rutaModelo.includes('hacha.glb')) {
-          visor.setAttribute('scale', '5 5 5');
-        } else {
-          visor.setAttribute('scale', '1 1 1');
-        }
-
-        // Obligar al motor de Google a redibujar el encuadre dimensional
-        if (typeof visor.updateFraming === 'function') {
-          visor.updateFraming();
-        }
-        
-        // Volver a activar la rotación sutil del museo
-        visor.setAttribute('auto-rotate', '');
-      }, 10);
-    }
-  </script>
-
-</body>
-</html>
+      <button class="btn-pieza activo" onclick="cambiarModelo('modelos/bifaz.glb', 'Bifaz: La supervivencia nómada', 'Este bifaz de sílex tallado por las dos caras representa la vida nómada del Paleolítico. Las comunidades dependían de lo que cazaban y recolectaban
