@@ -252,7 +252,8 @@
         scale="1 1 1"
         ar
         ar-scale="auto"
-        ar-modes="webxr scene-viewer quick-look"
+        ar-placement="floor"
+        camera-target="0m 0m 0m"
         camera-controls
         auto-rotate
         interaction-prompt="auto"
@@ -292,42 +293,39 @@
     function cambiarModelo(rutaModelo, titulo, descripcion, idVideo, botonPulsado) {
       const visor = document.getElementById('visor');
       
-      // 1. Apagamos la rotación para realizar el cambio en frío
+      // 1. Pausamos la rotación
       visor.removeAttribute('auto-rotate');
 
-      // 2. Actualizamos la interfaz de usuario (Textos e Iframe de vídeo)
+      // 2. Modificamos textos y el vídeo de YouTube (Funciona siempre)
       document.getElementById('titulo-pieza').innerText = titulo;
       document.getElementById('desc-pieza').innerText = descripcion;
-      document.getElementById('video-youtube').src = 'https://www.youtube.com/embed/' + idVideo + '?rel=0&timestamp=' + new Date().getTime();
+      document.getElementById('video-youtube').src = 'https://www.youtube.com/embed/' + idVideo;
 
-      // 3. CAMBIO DE MODELO SEGURO CON RETARDO DE ESTABILIZACIÓN
-      // Esto evita que el motor gráfico colapse al cambiar rutas y escalas a la vez
-      setTimeout(() => {
-        visor.setAttribute('src', rutaModelo);
-        const rutaIphone = rutaModelo.replace('.glb', '.usdz');
-        visor.setAttribute('ios-src', rutaIphone);
-        visor.setAttribute('alt', titulo);
+      // 3. Cambiamos las rutas del modelo 3D de forma directa
+      visor.setAttribute('src', rutaModelo);
+      const rutaIphone = rutaModelo.replace('.glb', '.usdz');
+      visor.setAttribute('ios-src', rutaIphone);
+      visor.setAttribute('alt', titulo);
 
-        // Calibración final: El visor web se queda estricto en 1 1 1 para que se vea impecable.
-        // Elevamos proporcionalmente el hacha para que en la RA no aparezca diminuta.
-        if (rutaModelo.includes('hacha.glb')) {
-          visor.setAttribute('scale', '2 2 2');
-        } else {
-          visor.setAttribute('scale', '1 1 1');
-        }
+      // 4. CALIBRACIÓN INTELIGENTE DE TAMAÑOS
+      // El visor web se queda estricto en 1 1 1. Ajustamos escalas de forma que en la RA respondan bien.
+      if (rutaModelo.includes('hacha.glb')) {
+        visor.setAttribute('scale', '4 4 4'); // Hacemos el hacha 4 veces más grande para que en RA se vea perfecta
+      } else {
+        visor.setAttribute('scale', '1 1 1'); // El bifaz y la flecha se quedan en su tamaño estándar
+      }
 
-        // Forzamos al renderizador de Google a encuadrar correctamente el nuevo archivo
-        if (typeof visor.updateFraming === 'function') {
-          visor.updateFraming();
-        }
-      }, 50);
+      // 5. Forzamos al visor a centrar la cámara en el nuevo objeto
+      if (typeof visor.updateFraming === 'function') {
+        visor.updateFraming();
+      }
 
-      // 4. Reactivación del giro automático
+      // 6. Reactivamos el giro con seguridad
       setTimeout(() => { 
         visor.setAttribute('auto-rotate', ''); 
-      }, 150);
+      }, 100);
 
-      // 5. Gestión estética de las pestañas activas del menú
+      // 7. Cambiar clase activa en el menú de botones
       const botones = document.querySelectorAll('.btn-pieza');
       botones.forEach(btn => btn.classList.remove('activo'));
       if (botonPulsado) {
